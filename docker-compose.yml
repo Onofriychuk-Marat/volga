@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    backend:
+        build: ./backend
+        container_name: backend1
+        command: sh start.sh
+        ports:
+            - "3000:3000"
+        environment:
+            URL_DB: 'postgres://app:42@postgres:5432/app'
+            BASE_URL: 'http://localhost:3000'
+            NODE_ENV: development
+        volumes:
+            - ./backend/src:/usr/src/app/backend/src
+        depends_on:
+            - postgres
+        restart: unless-stopped
+        stdin_open: true
+        tty: true
+        networks:
+            - realworld-docker-network
+
+    postgres:
+        image: postgres:10.4
+        ports:
+            - "35000:5432"
+        environment:
+            POSTGRES_USER: app
+            POSTGRES_PASSWORD: '42'
+            POSTGRES_DB: app
+        networks:
+            - realworld-docker-network
+
+networks:
+    realworld-docker-network:
+        driver: bridge
